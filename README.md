@@ -59,7 +59,6 @@ GitHub Parser is a tool that helps developers and teams gain insights from GitHu
 
 - Frontend runs on http://localhost:3000
 - Backend API runs on http://localhost:8000
-- API documentation available at http://localhost:8000/api/docs/
 - Uses Tailwind CSS for styling
 
 ## API Documentation
@@ -67,6 +66,7 @@ GitHub Parser is a tool that helps developers and teams gain insights from GitHu
 - Interactive API documentation available at:
   - Swagger UI: http://localhost:8000/swagger/
   - Redoc: http://localhost:8000/redoc/
+
 ## API Endpoints
 
 - `/api/v1/repositories/` - GitHub repository analysis
