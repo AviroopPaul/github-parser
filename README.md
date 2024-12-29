@@ -13,6 +13,7 @@ GitHub Parser is a tool that helps developers and teams gain insights from GitHu
 
 ## Project Structure
 
+```
 github-parser/
 ├── frontend/ # React frontend application
 │ ├── public/ # Static files
@@ -21,6 +22,7 @@ github-parser/
 ├── .env # Environment variables
 ├── .gitignore # Project-wide ignores
 └── README.md # This file
+```
 
 ## Setup and Installation
 
