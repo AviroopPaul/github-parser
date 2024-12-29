@@ -9,41 +9,64 @@ GitHub Parser is a tool that helps developers and teams gain insights from GitHu
 ## Tech Stack
 
 - Frontend: React.js with Tailwind CSS
+- Backend: Django REST Framework
 - API: GitHub REST API
-
-## Project Structure
-
-```
-github-parser/
-├── frontend/ # React frontend application
-│ ├── public/ # Static files
-│ ├── src/ # Source code
-│ └── .gitignore # Frontend specific ignores
-├── .env # Environment variables
-├── .gitignore # Project-wide ignores
-└── README.md # This file
-```
 
 ## Setup and Installation
 
-1. Clone the repository:
-   git clone https://github.com/yourusername/github-parser.git
-   cd github-parser
+### Backend Setup
 
-2. Set up environment variables:
+1. Create and activate a virtual environment:
+
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+2. Install Python dependencies:
+
+   ```bash
+   cd backend
+   pip install -r requirements.txt
+   ```
+
+3. Set up environment variables:
 
    - Copy `.env.example` to `.env`
    - Fill in your environment variables
 
-3. Install and run the frontend:
+4. Run migrations and start the Django server:
+   ```bash
+   python manage.py migrate
+   python manage.py runserver
+   ```
+
+### Frontend Setup
+
+1. Install Node.js dependencies:
+
+   ```bash
    cd frontend
    npm install
+   ```
+
+2. Start the development server:
+   ```bash
    npm start
+   ```
 
 ## Development
 
 - Frontend runs on http://localhost:3000
+- Backend API runs on http://localhost:8000
+- API documentation available at http://localhost:8000/api/docs/
 - Uses Tailwind CSS for styling
+
+## API Endpoints
+
+- `/api/v1/repositories/` - GitHub repository analysis
+- `/api/v1/auth/` - Authentication endpoints
+- Full API documentation available in the Django REST Framework browsable API
 
 ## Contributing
 
