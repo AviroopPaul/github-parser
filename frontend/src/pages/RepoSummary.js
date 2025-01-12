@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 
 function RepoSummary() {
@@ -38,12 +38,12 @@ function RepoSummary() {
           <h1 className="text-3xl font-bold text-cyan-400">
             Repository Summary: {repoName}
           </h1>
-          <Link
-            to="/dashboard"
+          <button
+            onClick={() => window.history.back()}
             className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition-colors"
           >
             ← Back to Repositories
-          </Link>
+          </button>
         </div>
 
         <div className="bg-gray-800 rounded-lg border border-cyan-900/30 p-6">
