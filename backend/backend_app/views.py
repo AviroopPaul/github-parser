@@ -194,8 +194,24 @@ def generate_repo_summary(request, repo_name):
         access_token = auth_header.split(' ')[1]
         print(f"Access token obtained: {access_token[:10]}...")
         
-        # First, get the repository details
-        repo_url = f'https://api.github.com/repos/AviroopPaul/{repo_name}'
+        # First get the user data to get the username
+        user_response = requests.get(
+            'https://api.github.com/user',
+            headers={
+                'Authorization': f'Bearer {access_token}',
+                'Accept': 'application/json'
+            }
+        )
+        
+        if user_response.status_code != 200:
+            return Response({
+                'error': 'Failed to fetch user data'
+            }, status=user_response.status_code)
+            
+        username = user_response.json()['login']
+        
+        # Use the fetched username instead of hardcoded value
+        repo_url = f'https://api.github.com/repos/{username}/{repo_name}'
         headers = {
             'Authorization': f'Bearer {access_token}',
             'Accept': 'application/vnd.github.v3+json'
@@ -215,7 +231,7 @@ def generate_repo_summary(request, repo_name):
         
         # Fetch the README content
         # https://github.com/AviroopPaul/fintrac/blob/main/README.md
-        readme_url = f'https://api.github.com/repos/AviroopPaul/{repo_name}/readme'
+        readme_url = f'https://api.github.com/repos/{username}/{repo_name}/readme'
         print(f"Fetching README from: {readme_url}")
         readme_response = requests.get(readme_url, headers=headers)
         print(f"README response status: {readme_response.status_code}")
@@ -319,13 +335,29 @@ def check_dependencies(request, repo_name):
             'pip': {}
         }
 
-        # First, get the repository tree
-        tree_url = f'https://api.github.com/repos/AviroopPaul/{repo_name}/git/trees/main?recursive=1'
+        # Get the user data to get the username
+        user_response = requests.get(
+            'https://api.github.com/user',
+            headers={
+                'Authorization': f'Bearer {access_token}',
+                'Accept': 'application/json'
+            }
+        )
+        
+        if user_response.status_code != 200:
+            return Response({
+                'error': 'Failed to fetch user data'
+            }, status=user_response.status_code)
+            
+        username = user_response.json()['login']
+        
+        # Update tree URL to use dynamic username
+        tree_url = f'https://api.github.com/repos/{username}/{repo_name}/git/trees/main?recursive=1'
         tree_response = requests.get(tree_url, headers=headers)
         
         if tree_response.status_code != 200:
             # Try 'master' branch if 'main' doesn't exist
-            tree_url = f'https://api.github.com/repos/AviroopPaul/{repo_name}/git/trees/master?recursive=1'
+            tree_url = f'https://api.github.com/repos/{username}/{repo_name}/git/trees/master?recursive=1'
             tree_response = requests.get(tree_url, headers=headers)
             
             if tree_response.status_code != 200:
@@ -344,7 +376,7 @@ def check_dependencies(request, repo_name):
         # Check NPM dependencies for each package.json
         for package_path in package_files:
             try:
-                file_url = f'https://api.github.com/repos/AviroopPaul/{repo_name}/contents/{package_path}'
+                file_url = f'https://api.github.com/repos/{username}/{repo_name}/contents/{package_path}'
                 package_response = requests.get(file_url, headers=headers)
                 
                 if package_response.status_code == 200:
@@ -378,7 +410,7 @@ def check_dependencies(request, repo_name):
         # Check Python dependencies for each requirements.txt
         for req_path in requirements_files:
             try:
-                file_url = f'https://api.github.com/repos/AviroopPaul/{repo_name}/contents/{req_path}'
+                file_url = f'https://api.github.com/repos/{username}/{repo_name}/contents/{req_path}'
                 requirements_response = requests.get(file_url, headers=headers)
                 
                 if requirements_response.status_code == 200:
@@ -441,16 +473,31 @@ def update_dependencies(request, repo_name):
         updates = request.data.get('updates')
         file_type = 'package.json' if file_path.endswith('package.json') else 'requirements.txt'
 
-        # Get the default branch
-        repo_url = f'https://api.github.com/repos/AviroopPaul/{repo_name}'
+        # Get the user data to get the username
+        user_response = requests.get(
+            'https://api.github.com/user',
+            headers=headers
+        )
+        
+        if user_response.status_code != 200:
+            return Response({
+                'error': 'Failed to fetch user data'
+            }, status=user_response.status_code)
+            
+        username = user_response.json()['login']
+        
+        # Update all URLs to use dynamic username
+        repo_url = f'https://api.github.com/repos/{username}/{repo_name}'
+        
+        # Get repository info to determine default branch
         repo_response = requests.get(repo_url, headers=headers)
         if repo_response.status_code != 200:
-            return Response({'error': 'Could not fetch repository information'}, status=404)
+            return Response({'error': 'Could not fetch repository information'}, status=500)
         
         default_branch = repo_response.json()['default_branch']
-
+        
         # Get the current file content
-        file_url = f'https://api.github.com/repos/AviroopPaul/{repo_name}/contents/{file_path}'
+        file_url = f'https://api.github.com/repos/{username}/{repo_name}/contents/{file_path}'
         file_response = requests.get(file_url, headers=headers)
         if file_response.status_code != 200:
             return Response({'error': 'Could not fetch file content'}, status=404)
@@ -465,7 +512,7 @@ def update_dependencies(request, repo_name):
 
         # Get the SHA of the default branch
         ref_response = requests.get(
-            f'https://api.github.com/repos/AviroopPaul/{repo_name}/git/refs/heads/{default_branch}',
+            f'https://api.github.com/repos/{username}/{repo_name}/git/refs/heads/{default_branch}',
             headers=headers
         )
         if ref_response.status_code != 200:
@@ -475,7 +522,7 @@ def update_dependencies(request, repo_name):
 
         # Create new branch
         create_branch_response = requests.post(
-            f'https://api.github.com/repos/AviroopPaul/{repo_name}/git/refs',
+            f'https://api.github.com/repos/{username}/{repo_name}/git/refs',
             headers=headers,
             json={
                 'ref': f'refs/heads/{new_branch}',
@@ -525,7 +572,7 @@ def update_dependencies(request, repo_name):
 
         # Create Pull Request
         pr_response = requests.post(
-            f'https://api.github.com/repos/AviroopPaul/{repo_name}/pulls',
+            f'https://api.github.com/repos/{username}/{repo_name}/pulls',
             headers=headers,
             json={
                 'title': 'Update Dependencies to Latest Versions',

@@ -6,6 +6,13 @@ A modern web application for analyzing and visualizing GitHub repository data.
 
 GitHub Parser is a tool that helps developers and teams gain insights from GitHub repositories through advanced parsing and analysis features.
 
+## Features
+
+- Summarize GitHub repositories into resume ready points
+- Update dependencies directly with auto PR creation
+
+More features coming soon!
+
 ## Tech Stack
 
 - Frontend: React.js with Tailwind CSS
